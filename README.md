@@ -1,1 +1,1 @@
-# Oddam-w-dobre-rece
+# Oddam-w-dobre-ręce
