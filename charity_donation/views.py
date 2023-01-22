@@ -3,6 +3,7 @@ from django.views import View
 from django.http import HttpResponse
 
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 
 from charity_donation.models import Category, Institution, Donation
 # Create your views here.
@@ -29,6 +30,18 @@ class AddDonation(View):
 class Login(View):
     def get(self, request):
         return render(request, "login.html")
+
+    def post(self, request):
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("index")
+        else:
+            return render(request, 'login.html', {'error': 'Wrong username or password'})
+
+
 
 
 class Register(View):
