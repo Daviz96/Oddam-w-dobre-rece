@@ -6,7 +6,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
 from charity_donation.models import Category, Institution, Donation
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 # Create your views here.
+
+
 class LandingPage(View):
     def get(self, request):
         type1 = Institution.objects.filter(type=1)
@@ -22,9 +26,14 @@ class LandingPage(View):
         return render(request, "index.html", ctx)
 
 
-class AddDonation(View):
+class AddDonation(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "form.html")
+        categories = Category.objects.all()
+        if request.user.is_authenticated:
+            user = request.user
+        else:
+            user = None
+        return render(request, "form.html", {"user": user, "categories": categories})
 
 
 class Login(View):
@@ -62,5 +71,14 @@ class Register(View):
             return render(request, 'register.html', {'error': 'Passwords do not match'})
 
         return redirect('login')
+
+
+class LogoutView(View):
+    def get(self, request):
+        # Log out the user
+        logout(request)
+
+        # Redirect the user to the login page
+        return redirect('index')
 
 
