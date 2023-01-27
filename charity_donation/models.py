@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Institution(models.Model):
 
@@ -21,6 +24,9 @@ class Institution(models.Model):
     type = models.SmallIntegerField(choices=FUNDATIONS)
     categories = models.ManyToManyField(Category)
 
+    def __str__(self):
+        return self.name
+
 
 class Donation(models.Model):
     quantity = models.IntegerField(default=0)
@@ -34,3 +40,6 @@ class Donation(models.Model):
     pick_up_time = models.TimeField()
     pick_up_comment = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True)
+    is_taken = models.BooleanField(default=False)
+
+

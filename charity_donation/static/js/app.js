@@ -196,6 +196,30 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$next.forEach(btn => {
         btn.addEventListener("click", e => {
           e.preventDefault();
+
+          if (this.currentStep === 2){
+
+            let checkList = this.$form.querySelectorAll(".valueCheckbox:checked");
+            let checkValueList = [];
+
+            for (let i=0; i < checkList.length; i++){
+              checkValueList.push(checkList[i].value);
+            };
+
+            let filtredCheckBoxes = this.$form.querySelectorAll(".filtred-checkbox");
+
+            for (let i=0; i < filtredCheckBoxes.length; i++){
+              let dataCategoryIds = filtredCheckBoxes[i].getAttribute("data-cat-ids").trim().trim().split('   ')
+              let check = dataCategoryIds.some(elem => checkValueList.includes(elem))
+              console.log(dataCategoryIds);
+              if (!(check)){
+                filtredCheckBoxes[i].setAttribute('hidden',true);
+              }
+              console.log(check)
+              };
+            };
+
+
           this.currentStep++;
           this.updateForm();
         });
@@ -237,19 +261,27 @@ document.addEventListener("DOMContentLoaded", function() {
       // TODO: get data from inputs and show them in summary
     }
 
+
     /**
      * Submit form
      *
      * TODO: validation, send data to server
      */
     submit(e) {
-      e.preventDefault();
+      if (this.currentStep < 5){
+        e.preventDefault();
+      }
       this.currentStep++;
       this.updateForm();
     }
+
+
+
   }
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);
   }
 });
+
+

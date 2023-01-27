@@ -1,36 +1,41 @@
 {% extends "__base__.html" %}
 {% load static %}
 {% block title %}{% endblock %}
-{% block content %}
-    <header class="header--form-page">
-        <nav class="container container--70">
-    {% if user %}
-        <ul class="nav--actions">
-          <li class="logged-user">
-            Witaj {{ user.first_name }}
-            <ul class="dropdown">
-              <li><a href="#">Profil</a></li>
-              <li><a href="#">Ustawienia</a></li>
-              <li><a href="{% url 'logout' %}">Wyloguj</a></li>
-            </ul>
-          </li>
-        </ul>
-          {% else %}
-        <ul class="nav--actions">
-          <li><a href="{% url 'login' %}" class="btn btn--small btn--without-border">Zaloguj</a></li>
-          <li><a href="{% url 'register' %}" class="btn btn--small btn--highlighted">Załóż konto</a></li>
-        </ul>
-            {% endif %}
+{% block header_class %} header--form-page {% endblock %}
 
-        <ul>
-          <li><a href="{% url 'index' %}" class="btn btn--without-border active">Start</a></li>
-          <li><a href="{% url 'index' %}#steps" class="btn btn--without-border">O co chodzi?</a></li>
-          <li><a href="{% url 'index' %}#about-us" class="btn btn--without-border">O nas</a></li>
-          <li><a href="{% url 'index' %}#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
-          <li><a href="{% url 'add-donation' %}" class="btn btn--without-border">Przekaż dary</a></li>
-          <li><a href="#contact" class="btn btn--without-border">Kontakt</a></li>
-        </ul>
-      </nav>
+{% block content %}
+{#    <header class="header--form-page">#}
+{#        <nav class="container container--70">#}
+{#    {% if user %}#}
+{#        <ul class="nav--actions">#}
+{#          <li class="logged-user">#}
+{#            Witaj {{ user.first_name }}#}
+{#            <ul class="dropdown">#}
+{#              <li><a href="#">Profil</a></li>#}
+{#              <li><a href="#">Ustawienia</a></li>#}
+{#                {% if user.is_superuser %}#}
+{#              <li><a href="/admin">Panel Admin</a></li>#}
+{#                    {% endif %}#}
+{#              <li><a href="{% url 'logout' %}">Wyloguj</a></li>#}
+{#            </ul>#}
+{#          </li>#}
+{#        </ul>#}
+{#          {% else %}#}
+{#        <ul class="nav--actions">#}
+{#          <li><a href="{% url 'login' %}" class="btn btn--small btn--without-border">Zaloguj</a></li>#}
+{#          <li><a href="{% url 'register' %}" class="btn btn--small btn--highlighted">Załóż konto</a></li>#}
+{#        </ul>#}
+{#            {% endif %}#}
+{##}
+{#        <ul>#}
+{#          <li><a href="{% url 'index' %}" class="btn btn--without-border active">Start</a></li>#}
+{#          <li><a href="{% url 'index' %}#steps" class="btn btn--without-border">O co chodzi?</a></li>#}
+{#          <li><a href="{% url 'index' %}#about-us" class="btn btn--without-border">O nas</a></li>#}
+{#          <li><a href="{% url 'index' %}#help" class="btn btn--without-border">Fundacje i organizacje</a></li>#}
+{#          <li><a href="{% url 'add-donation' %}" class="btn btn--without-border">Przekaż dary</a></li>#}
+{#          <li><a href="#contact" class="btn btn--without-border">Kontakt</a></li>#}
+{#        </ul>#}
+{#      </nav>#}
 
       <div class="slogan container container--90">
         <div class="slogan--item">
@@ -83,7 +88,8 @@
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="form-confirmation.html" method="post">
+        <form action="" method="POST">
+        {% csrf_token %}
           <!-- STEP 1: class .active is switching steps -->
           <div data-step="1" class="active">
             <h3>Zaznacz co chcesz oddać:</h3>
@@ -91,13 +97,14 @@
             <div class="form-group form-group--checkbox">
               <label>
                 <input
+                  class="valueCheckbox"
                   type="checkbox"
                   name="categories"
                   value="{{ cat.id }}"
                 />
                 <span class="checkbox"></span>
                 <span class="description"
-                  >{{ cat.name }}</span
+                  >{{ cat }}</span
                 >
               </label>
             </div>
@@ -127,37 +134,23 @@
 
 
 
-          <!-- STEP 4 -->
+          <!-- STEP 3 -->
           <div data-step="3">
             <h3>Wybierz organizacje, której chcesz pomóc:</h3>
-
-            <div class="form-group form-group--checkbox">
+            {% for inst in institutions %}
+            <divs class="form-group form-group--checkbox filtred-checkbox" data-cat-ids="{% for cat in inst.categories.all %}  {{ cat.id }} {% endfor %}">
               <label>
                 <input type="radio" name="organization" value="old" />
                 <span class="checkbox radio"></span>
                 <span class="description">
-                  <div class="title">Fundacja “Bez domu”</div>
+                  <div class="title">{{ inst.name }}</div>
                   <div class="subtitle">
-                    Cel i misja: Pomoc dla osób nie posiadających miejsca
-                    zamieszkania
+                    {{ inst.description }}
                   </div>
                 </span>
               </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="radio" name="organization" value="old" />
-                <span class="checkbox radio"></span>
-                <span class="description">
-                  <div class="title">Fundacja “Dla dzieci"</div>
-                  <div class="subtitle">
-                    Cel i misja: Pomoc osobom znajdującym się w trudnej sytuacji
-                    życiowej.
-                  </div>
-                </span>
-              </label>
-            </div>
+            </divs>
+              {% endfor %}
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
@@ -165,7 +158,7 @@
             </div>
           </div>
 
-          <!-- STEP 5 -->
+          <!-- STEP 4 -->
           <div data-step="4">
             <h3>Podaj adres oraz termin odbioru rzecz przez kuriera:</h3>
 
@@ -213,11 +206,11 @@
             </div>
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="toConfirm">Dalej</button>
             </div>
           </div>
 
-          <!-- STEP 6 -->
+          <!-- STEP 5 -->
           <div data-step="5">
             <h3>Podsumowanie Twojej darowizny</h3>
 
@@ -264,6 +257,7 @@
             </div>
 
             <div class="form-group form-group--buttons">
+                <input type="hidden" name="form-type" value="donation-form">
               <button type="button" class="btn prev-step">Wstecz</button>
               <button type="submit" class="btn">Potwierdzam</button>
             </div>
@@ -271,5 +265,45 @@
         </form>
       </div>
     </section>
+
+
+{#{% block javascript %}#}
+{##}
+{#    <script>#}
+{#        $("#toConfirm").click(function () {#}
+{#            let quantity = document.querySelector("input[name='bags']").value;#}
+{#            let bagsString = 'Ilość worków: ' + quantity;#}
+{#            document.getElementById("conf-quantity").innerText = bagsString;#}
+{##}
+{#            let institutionChecked = document.querySelector("input[name='organization']:checked");#}
+{#            let institutionSpan = institutionChecked.nextElementSibling.nextElementSibling;#}
+{#            let institution = institutionSpan.firstElementChild.innerText;#}
+{#            document.getElementById("conf-institution").innerText = 'Dla organizacji: ' + institution;#}
+{##}
+{#            let address = document.querySelector("input[name='address']").value;#}
+{#            let addressLi = document.getElementById("address");#}
+{#            addressLi.innerText = address;#}
+{#            let city = document.querySelector("input[name='city']").value;#}
+{#            addressLi.nextElementSibling.innerText = city;#}
+{#            let postcode = document.querySelector("input[name='postcode']").value;#}
+{#            addressLi.nextElementSibling.nextElementSibling.innerText = postcode;#}
+{#            let phone = document.querySelector("input[name='phone']").value;#}
+{#            addressLi.parentNode.lastElementChild.innerText = phone;#}
+{#            let date = document.querySelector("input[name='data']").value;#}
+{#            let dateLi = document.getElementById("date");#}
+{#            dateLi.innerText = date;#}
+{#            let time = document.querySelector("input[name='time']").value;#}
+{#            dateLi.nextElementSibling.innerText = time;#}
+{#            let comment = document.querySelector("textarea[name='more_info']").value;#}
+{#            if (comment.length !== 0) {#}
+{#                dateLi.parentNode.lastElementChild.innerText = comment;#}
+{#            } else {#}
+{#                dateLi.parentNode.lastElementChild.innerText = 'Brak uwag';#}
+{#            }#}
+{##}
+{#        })#}
+{#    </script>#}
+{##}
+{#{% endblock %}#}
 
 {% endblock content %}
