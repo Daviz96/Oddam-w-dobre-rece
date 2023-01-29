@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$next.forEach(btn => {
         btn.addEventListener("click", e => {
           e.preventDefault();
+          let filtredCheckBoxes = this.$form.querySelectorAll(".filtred-checkbox");
 
           if (this.currentStep === 2){
 
@@ -206,19 +207,56 @@ document.addEventListener("DOMContentLoaded", function() {
               checkValueList.push(checkList[i].value);
             };
 
-            let filtredCheckBoxes = this.$form.querySelectorAll(".filtred-checkbox");
-
             for (let i=0; i < filtredCheckBoxes.length; i++){
-              let dataCategoryIds = filtredCheckBoxes[i].getAttribute("data-cat-ids").trim().trim().split('   ')
-              let check = dataCategoryIds.some(elem => checkValueList.includes(elem))
-              console.log(dataCategoryIds);
+              let dataCategoryIds = filtredCheckBoxes[i].getAttribute("data-cat-ids").trim().trim().split('   ');
+              let check = dataCategoryIds.some(elem => checkValueList.includes(elem));
               if (!(check)){
                 filtredCheckBoxes[i].setAttribute('hidden',true);
+                }
               }
-              console.log(check)
-              };
-            };
+            }
 
+          if (this.currentStep === 4) {
+            let bags = this.$form.querySelector("#bags").value;
+            let org_title = '';
+            let org_subtitle = '';
+            for (let i=0; i<filtredCheckBoxes.length; i++){
+              let radio_input = filtredCheckBoxes[i].querySelector('[name="organization"]')
+              if (radio_input.checked){
+                org_title = filtredCheckBoxes[i].querySelector('.title').innerText;
+                org_subtitle = filtredCheckBoxes[i].querySelector('.subtitle').innerText;
+
+              }
+            }
+            let address = this.$form.querySelector('[name="address"]').value
+            let city = this.$form.querySelector('[name="city"]').value
+            let postcode = this.$form.querySelector('[name="postcode"]').value
+            let phone = this.$form.querySelector('[name="phone"]').value
+            let data = this.$form.querySelector('[name="data"]').value
+            let time = this.$form.querySelector('[name="time"]').value
+            let more_info = this.$form.querySelector('[name="more_info"]').value
+
+            let summary_bags = this.$form.querySelector('#summary-bags')
+            summary_bags.innerText = bags + ' worki'
+            let summary_description = this.$form.querySelector('#summary-description')
+            summary_description.innerText = 'Dla fundacji "'+ org_title +'"'
+            let summary_address = this.$form.querySelector('#summary-address')
+            summary_address.innerText = address
+            let summary_city = this.$form.querySelector('#summary-city')
+            summary_city.innerText = city
+            let summary_postcode = this.$form.querySelector('#summary-postcode')
+            summary_postcode.innerText = postcode
+            let summary_phone = this.$form.querySelector('#summary-phone')
+            summary_phone.innerText = phone
+            let summary_data = this.$form.querySelector('#summary-data')
+            summary_data.innerText = data
+            let summary_time = this.$form.querySelector('#summary-time')
+            summary_time.innerText = time
+            let summary_more_info = this.$form.querySelector('#summary-more_info')
+            summary_more_info.innerText = more_info
+
+
+          }
 
           this.currentStep++;
           this.updateForm();

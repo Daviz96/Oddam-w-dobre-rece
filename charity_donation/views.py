@@ -39,34 +39,34 @@ class AddDonation(LoginRequiredMixin, View):
 
     def post(self, request):
         if request.POST.get("form-type") == "donation-form":
+            categories_id = request.POST.getlist('categories')
+            categories = Category.objects.filter(id__in=categories_id).distinct()
+            quantity = request.POST.get('bags')
+            institution = get_object_or_404(Institution, id=request.POST.get('organization'))
+            address = request.POST.get('address')
+            city = request.POST.get('city')
+            zip_code = request.POST.get('postcode')
+            phone_number = request.POST.get('phone')
+            pick_up_date = request.POST.get('data')
+            pick_up_time = request.POST.get('time')
+            pick_up_comment = request.POST.get('more_info')
+            new_donation = Donation.objects.create(quantity=quantity,
+                                                   institution=institution,
+                                                   address=address,
+                                                   phone_number=phone_number,
+                                                   city=city,
+                                                   zip_code=zip_code,
+                                                   pick_up_date=pick_up_date,
+                                                   pick_up_time=pick_up_time,
+                                                   pick_up_comment=pick_up_comment,
+                                                   user=request.user)
+            new_donation.categories.add(*categories)
+            new_donation.save()
+
             return redirect('form-confirmation')
         if request.POST.get("form-type") == "contact-form":
             return redirect('register')
 
-        # categories_id = request.POST.getlist('categories')
-        # categories = Category.objects.filter(id__in=categories_id).distinct()
-        # quantity = request.POST.get('bags')
-        # institution = get_object_or_404(Institution, id=request.POST.get('organization'))
-        # address = request.POST.get('address')
-        # city = request.POST.get('city')
-        # zip_code = request.POST.get('postcode')
-        # phone_number = request.POST.get('phone')
-        # pick_up_date = request.POST.get('data')
-        # pick_up_time = request.POST.get('time')
-        # pick_up_comment = request.POST.get('more_info')
-        # new_donation = Donation.objects.create(quantity=quantity,
-        #                                        institution=institution,
-        #                                        address=address,
-        #                                        phone_number=phone_number,
-        #                                        city=city,
-        #                                        zip_code=zip_code,
-        #                                        pick_up_date=pick_up_date,
-        #                                        pick_up_time=pick_up_time,
-        #                                        pick_up_comment=pick_up_comment,
-        #                                        user=request.user)
-        # new_donation.categories.add(*categories)
-        # new_donation.save()
-        # return redirect('form-confirmation')
 
 
 class FormConfirmationView(View):
